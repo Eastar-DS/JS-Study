@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>실험 2 — margin-left vs transform</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 800px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin-right: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .stage {
+      position: relative;
+      height: 120px;
+      background: #fafafa;
+      border: 1px solid #ddd;
+      margin: 12px 0;
+      overflow: hidden;
+    }
+
+    .box {
+      width: 80px;
+      height: 80px;
+      margin: 20px;
+      background: royalblue;
+      border-radius: 8px;
+      transition: 0.6s;
+    }
+
+    .move-margin {
+      margin-left: 600px;
+    }
+
+    .move-transform {
+      transform: translateX(580px);
+    }
+
+    /* 주변 요소가 함께 있어야 Layout 영향이 보임 */
+    .siblings {
+      display: flex;
+      gap: 8px;
+      padding: 0 20px;
+    }
+
+    .sibling {
+      width: 30px;
+      height: 30px;
+      background: tomato;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>실험 2. margin-left 애니메이션 vs transform 애니메이션</h1>
+
+  <p>
+    같은 거리만큼 박스를 오른쪽으로 움직입니다.<br>
+    한쪽은 Layout부터 다시 일어나고, 한쪽은 Composite만으로 끝날 가능성이 큽니다.<br>
+    DevTools Performance에서 보라색(Rendering)과 초록색(Painting) 비율을 비교해보세요.
+  </p>
+
+  <h3>방법 1. margin-left 애니메이션</h3>
+  <div class="stage">
+    <div id="box1" class="box"></div>
+    <div class="siblings">
+      <div class="sibling"></div>
+      <div class="sibling"></div>
+      <div class="sibling"></div>
+    </div>
+  </div>
+  <button id="run-margin">margin으로 이동</button>
+  <button id="reset-margin">원위치</button>
+
+  <h3>방법 2. transform 애니메이션</h3>
+  <div class="stage">
+    <div id="box2" class="box"></div>
+    <div class="siblings">
+      <div class="sibling"></div>
+      <div class="sibling"></div>
+      <div class="sibling"></div>
+    </div>
+  </div>
+  <button id="run-transform">transform으로 이동</button>
+  <button id="reset-transform">원위치</button>
+
+  <hr>
+
+  <h3>관찰 포인트</h3>
+  <ul>
+    <li>방법 1: 박스의 margin이 바뀌면서 주변 요소(siblings)의 위치도 바뀝니다. → Layout 다시 필요</li>
+    <li>방법 2: transform은 시각적으로만 이동시킵니다. 주변 요소는 그대로입니다. → Composite만으로 가능</li>
+    <li>Performance 패널에서 방법 1은 Rendering(보라)이 두꺼워집니다.</li>
+    <li>방법 2는 Rendering이 거의 없고 Composite Layers 작업만 보입니다.</li>
+  </ul>
+
+  <script>
+    const box1 = document.querySelector('#box1');
+    const box2 = document.querySelector('#box2');
+
+    document.querySelector('#run-margin').addEventListener('click', () => {
+      box1.classList.add('move-margin');
+    });
+    document.querySelector('#reset-margin').addEventListener('click', () => {
+      box1.classList.remove('move-margin');
+    });
+
+    document.querySelector('#run-transform').addEventListener('click', () => {
+      box2.classList.add('move-transform');
+    });
+    document.querySelector('#reset-transform').addEventListener('click', () => {
+      box2.classList.remove('move-transform');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>실험 1 — innerHTML 반복 vs 일괄</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 800px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin-right: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #log {
+      margin: 16px 0;
+      padding: 12px;
+      background: #f5f5f5;
+      border-radius: 6px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      min-height: 60px;
+    }
+
+    #list {
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 8px;
+    }
+
+    #list li {
+      padding: 4px 0;
+      border-bottom: 1px solid #eee;
+    }
+  </style>
+</head>
+<body>
+  <h1>실험 1. innerHTML 반복 vs 일괄</h1>
+
+  <p>
+    1000개의 li를 추가합니다. 두 방법이 결과는 같지만 비용은 다릅니다.
+    DevTools Performance를 켜고 각 버튼을 눌러 비교해보세요.
+  </p>
+
+  <button id="bad">나쁜 방법: innerHTML += 반복 1000번</button>
+  <button id="good">좋은 방법: 문자열 합쳐서 한 번에</button>
+  <button id="reset">리셋</button>
+
+  <div id="log">버튼을 눌러보세요.</div>
+
+  <ul id="list"></ul>
+
+  <script>
+    const list = document.querySelector('#list');
+    const log = document.querySelector('#log');
+
+    document.querySelector('#bad').addEventListener('click', () => {
+      list.innerHTML = '';
+      const start = performance.now();
+
+      for (let i = 0; i < 1000; i++) {
+        list.innerHTML += `<li>item ${i}</li>`;
+      }
+
+      const elapsed = performance.now() - start;
+      log.textContent = `[나쁜 방법] ${elapsed.toFixed(2)}ms\n` +
+        `1000번 innerHTML += 했습니다. 매번 파싱과 DOM 재구성이 일어났을 가능성이 큽니다.`;
+    });
+
+    document.querySelector('#good').addEventListener('click', () => {
+      list.innerHTML = '';
+      const start = performance.now();
+
+      let html = '';
+      for (let i = 0; i < 1000; i++) {
+        html += `<li>item ${i}</li>`;
+      }
+      list.innerHTML = html;
+
+      const elapsed = performance.now() - start;
+      log.textContent = `[좋은 방법] ${elapsed.toFixed(2)}ms\n` +
+        `문자열로 만든 뒤 한 번만 innerHTML에 넣었습니다. DOM 변경이 1번뿐입니다.`;
+    });
+
+    document.querySelector('#reset').addEventListener('click', () => {
+      list.innerHTML = '';
+      log.textContent = '비웠습니다.';
+    });
+  </script>
+
+  <hr>
+
+  <h3>관찰 포인트</h3>
+  <ul>
+    <li>두 방법의 ms 차이는 보통 수십~수백 배입니다.</li>
+    <li>Performance 패널에서 "나쁜 방법"은 Scripting과 Rendering이 길게 반복됩니다.</li>
+    <li>"좋은 방법"은 Scripting이 짧고 Rendering이 한 번에 일어납니다.</li>
+    <li>핵심: 같은 결과지만 브라우저가 한 일의 양이 다릅니다.</li>
+  </ul>
+</body>
+</html>

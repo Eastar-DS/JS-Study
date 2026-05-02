@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>실험 3 — 이미지 Layout Shift</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 800px;
+      margin: 24px auto;
+      padding: 0 16px;
+    }
+
+    button {
+      padding: 12px 20px;
+      margin-right: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .demo {
+      border: 1px solid #ccc;
+      padding: 16px;
+      margin: 16px 0;
+      border-radius: 6px;
+    }
+
+    .target-button {
+      display: block;
+      margin-top: 12px;
+      padding: 12px 20px;
+      background: tomato;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .target-button:hover {
+      background: crimson;
+    }
+  </style>
+</head>
+<body>
+  <h1>실험 3. 이미지 Layout Shift</h1>
+
+  <p>
+    "사용자가 누르려던 버튼이 마지막 순간에 밀린다" — 가장 짜증나는 UX 버그입니다.<br>
+    아래 두 데모를 새로고침하면서 비교해보세요. 빨간 버튼을 누르려는 시점에 이미지가 도착하면 어떻게 되는지 관찰합니다.<br>
+    네트워크가 너무 빠르면 차이가 잘 안 보일 수 있으니, DevTools의 Network 탭에서 <b>Throttling: Slow 3G</b>로 설정하고 새로고침하세요.
+  </p>
+
+  <button onclick="location.reload()">새로고침 (둘 다 다시 로드)</button>
+
+  <div class="demo">
+    <h3>나쁜 예: 이미지에 width/height 없음</h3>
+    <p>
+      이미지가 늦게 도착하면 갑자기 공간을 차지하면서 아래 버튼이 밀립니다.
+    </p>
+    <img src="https://picsum.photos/seed/lcp1/600/300?random=1">
+    <button class="target-button">눌러야 할 버튼 (밀릴 수 있음)</button>
+  </div>
+
+  <div class="demo">
+    <h3>좋은 예: 이미지에 width/height 지정</h3>
+    <p>
+      브라우저가 이미지 도착 전부터 공간을 예약합니다. 버튼 위치가 흔들리지 않습니다.
+    </p>
+    <img src="https://picsum.photos/seed/lcp2/600/300?random=2" width="600" height="300">
+    <button class="target-button">눌러야 할 버튼 (안 밀림)</button>
+  </div>
+
+  <hr>
+
+  <h3>관찰 포인트</h3>
+  <ul>
+    <li>네트워크를 Slow 3G로 설정한 뒤 페이지를 새로고침하세요.</li>
+    <li>나쁜 예: 이미지가 도착하는 순간 빨간 버튼이 아래로 점프합니다.</li>
+    <li>좋은 예: 이미지가 도착해도 버튼 위치는 그대로입니다.</li>
+    <li>이게 바로 <b>Cumulative Layout Shift (CLS)</b>입니다. 구글의 Core Web Vitals 지표 중 하나입니다.</li>
+    <li>핵심: 브라우저가 Layout을 미리 계산할 수 있도록 <b>크기 정보를 미리 제공</b>해야 합니다.</li>
+  </ul>
+
+  <h3>왜 이게 중요한가</h3>
+  <ul>
+    <li>사용자는 누르려던 버튼을 잘못 누르게 됩니다 (예: "구매" 자리에 "환불" 버튼이 와서 잘못 누름).</li>
+    <li>SEO에도 영향을 줍니다. Google은 CLS를 검색 순위에 반영합니다.</li>
+    <li>크기 정보 한 줄을 추가하는 것만으로 해결됩니다.</li>
+  </ul>
+</body>
+</html>
